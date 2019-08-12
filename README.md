@@ -6,16 +6,16 @@ Referenced architecture: https://docs.microsoft.com/en-us/azure/architecture/ref
 
 <h2>Configuration:</h2>
 
-You require the Log Analytics workspace ID and primary key. The workspace ID is the workspaceId value from the logAnalytics output section in step 4 of the deploy the Azure resources section. The primary key is the secret from the output section.
+You require the Log Analytics workspace ID and primary key. The workspace ID is the workspaceId value from the Log Analytics resource in Azure. The primary key is the secret the resource specified in order to inteact with the service.
 
-To configure log4j logging, open log4j.properties. Edit the following two values:
+To configure log4j logging, open log4j.properties. Edit the following two values  and save the file. We will use it later.
 
 ```
 log4j.appender.A1.workspaceId=[Log Analytics workspace ID]
 log4j.appender.A1.secret=[Log Analytics primary key]
 ```
 
-To configure custom logging, open metrics.properties. Edit the following two values:
+To configure custom logging, open metrics.properties. Edit the following two values and save the file. We will use it later.
 
 ```
 *.sink.loganalytics.workspaceId=[Log Analytics workspace ID]
@@ -23,7 +23,7 @@ To configure custom logging, open metrics.properties. Edit the following two val
 ```
 
 <h2>Build the .jar files for the Databricks job and Databricks monitoring</h2>
-Use your Java IDE to import the Maven project file named pom.xml located in the root directory. Perform a clean build. The output of this build is files named azure-databricks-monitoring-0.9.jar. A prebuilt jar can be found in the built directory. Version used in this case was JRE 1.8.0_191 with Maven 3.6.0.
+We need to specified a way to convert the logs from the log4j format to the one Azure is expecting. We use a JAR module to achieve so. Use your Java IDE to import the Maven project file named pom.xml located in the root directory. Perform a clean build. The output of this build is files named azure-databricks-monitoring-0.9.jar. If you want to skip this, a prebuilt jar can be found in the built directory I created for your convenience. Version used in this case was JRE 1.8.0_191 with Maven 3.6.0.
 
 <h2>Configure custom logging for the Databricks job</h2>
 Copy the azure-databricks-monitoring-0.9.jar file to the Databricks file system by entering the following command in the Databricks CLI:
@@ -37,7 +37,7 @@ Copy the custom logging properties from metrics.properties to the Databricks fil
 databricks fs cp --overwrite metrics.properties dbfs:/azure-databricks-job/metrics.properties
 ```
 
-While you haven't yet decided on a name for your Databricks cluster, select one now. You'll enter the name below in the Databricks file system path for your cluster. Copy the initialization script from spark.metrics to the Databricks file system by entering the following command:
+Copy the initialization script from spark.metrics to the Databricks file system by entering the following command:
 ```
 databricks fs cp --overwrite spark-metrics.sh dbfs:/databricks/init/[cluster-name]/spark-metrics.sh
 ```
